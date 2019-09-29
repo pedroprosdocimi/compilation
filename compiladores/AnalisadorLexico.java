@@ -416,7 +416,7 @@ public class AnalisadorLexico {
 	
 	public int Caso_12(char c) {
 		
-		if(c == '*'){  
+		if(c != '/'){  
             return 11;
         }
         
