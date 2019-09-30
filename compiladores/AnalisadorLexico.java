@@ -53,7 +53,7 @@ public class AnalisadorLexico {
 		while(estadoAtual != estadoFinal){
 			
 			c = t.charAt(i);
-			//System.out.print(c);
+			System.out.print(c);
 			pos++;
 			if(c == 10) linha++;
 			
@@ -219,6 +219,7 @@ public class AnalisadorLexico {
         } 
             
         else if(c == '/'){
+        	lexema += c;
             return 10;                
         }
             
@@ -260,7 +261,9 @@ public class AnalisadorLexico {
         	if(tabelaSimbolos.PesquisarNaTabela(lexema)==null)
         		tabelaSimbolos.InserirNaTabela(Token.ID, lexema);
         	
-        	registroLexico = new RegistroLexico(Token.ID, lexema, tabelaSimbolos.PesquisarNaTabela(lexema), null);
+        	Integer pos = tabelaSimbolos.PesquisarNaTabela(lexema);
+        	
+        	registroLexico = new RegistroLexico(tabelaSimbolos.RetornaToken(pos), lexema, tabelaSimbolos.PesquisarNaTabela(lexema), null);
         	Devolve();
         	
             return estadoFinal;            
@@ -512,8 +515,6 @@ public class AnalisadorLexico {
 		if (c == '*') 
 			return new RegistroLexico(Token.MULTIPLICACAO, "*", null, null);
 		
-		if (c == 26) 
-			return new RegistroLexico(Token.EOF, "EOF", null, null);
 		
 		return new RegistroLexico(Token.ERRO, "", null, null);
 		

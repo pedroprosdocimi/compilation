@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 public class Principal {
 	public static void main(String[] args) throws IOException{
 		
-	    Path wiki_path = Paths.get("C:/Users/Pedro/eclipse-workspace/compiladores/src/compiladores/", "exemplo.l");
+	    Path wiki_path = Paths.get("C:/Users/Pedro/eclipse-workspace/compiladores/src/compiladores/", "exemplo6.l");
 	    
 		AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
 		
@@ -24,17 +24,8 @@ public class Principal {
 		}
 		
 	    String codigo = new String(codigoFonte, "ASCII");
-		
-		int o = 0;
-		try {
-		while(!codigo.isEmpty()) {
-			System.out.println(codigo);
-			codigo = analisadorLexico.Analisar(codigo);
-			//System.out.println("---->"+analisadorLexico.registroLexico.lexema);
-			o++;
-		}
-		}catch(StringIndexOutOfBoundsException e) {
-			
-		}
-	}	
+		codigo = analisadorLexico.Analisar(codigo);
+		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico);
+		analisadorSintatico.Proc_S();
+	}
 }

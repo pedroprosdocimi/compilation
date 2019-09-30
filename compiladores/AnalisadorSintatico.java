@@ -3,35 +3,45 @@ package compiladores;
 public class AnalisadorSintatico {
 	
 	Token token;
-	AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
+	AnalisadorLexico analisadorLexico;
 	String codigo;
 
+	public AnalisadorSintatico(Token token, String codigo, AnalisadorLexico analisadorLexico) {
+		this.token = token;
+		this.codigo = codigo;
+		this.analisadorLexico = analisadorLexico;
+	}
+	
 	public void CasaToken(Token token_esperado) {
+		System.out.println("Lexema: "+analisadorLexico.lexema+"  Token: "+token);
 		if(token == token_esperado) {
-			token = token_esperado;
 			codigo = analisadorLexico.Analisar(codigo);
+			token = analisadorLexico.registroLexico.token;
+			
+			
 		}else {
-			System.out.println("Erro Sintatico");
+			System.out.println(analisadorLexico.linha+":token nao esperado["+analisadorLexico.lexema+"]");
 		}
 	}
 	
 	public void Proc_S() {
 		while(token == Token.INTEGER || token == Token.BOOLEAN || token == Token.BYTE || token == Token.STRING || token == Token.CONST) {
 			Proc_D();
-			if(token == Token.MAIN) {
-				CasaToken(Token.MAIN);
-				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
-					Proc_C();
-				}
-				while((token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN)) {
-					Proc_C();
-				}
-				if(token == Token.END) {
-					CasaToken(Token.END);
-				}
-					
-			}
 		}
+		if(token == Token.MAIN) {
+			CasaToken(Token.MAIN);
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+				Proc_C();
+			}
+			while((token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN)) {
+				Proc_C();
+			}
+			if(token == Token.END) {
+				CasaToken(Token.END);
+			}
+					
+		}
+		
 	}
 	
 	public void Proc_D() {
@@ -104,7 +114,8 @@ public class AnalisadorSintatico {
 				Proc_EXP();
 			}
 			CasaToken(Token.FECHA_PARENTESES);
-			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.THEN) {
+			CasaToken(Token.THEN);
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.BEGIN) {
 				Proc_C1();
 			}			
 			
@@ -166,7 +177,7 @@ public class AnalisadorSintatico {
 					}
 				}
 			}
-		}else if(token == Token.THEN) {
+		}else if(token == Token.BEGIN) {
 			CasaToken(Token.THEN);
 			CasaToken(Token.BEGIN);
 			while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
@@ -227,9 +238,111 @@ public class AnalisadorSintatico {
 	}
 	
 	public void Proc_EXP() {
-		
+		if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			Proc_EXPS();
+		}
+		if(token == Token.IGUAL || token == Token.DIFERENTE_DE || token == Token.MENOR_QUE || token == Token.MAIOR_QUE || token == Token.MENOR_OU_IGUAL_QUE || token == Token.MAIOR_OU_IGUAL_QUE) {
+			CasaToken(IdentificaToken_EXP());
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				Proc_EXPS();
+			}
+		}
 	}
 	
+	public void Proc_EXPS() {
+		if(token == Token.MAIS || token == Token.MENOS) {
+			CasaToken(IdentificaToken_EXPS(false));
+		}
+		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			Proc_T();
+		}
+		while(token == Token.MAIS || token == Token.MENOS || token == Token.OR) {
+			CasaToken(IdentificaToken_EXPS(true));
+			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				Proc_T();
+			}
+		}
+	}
+	
+	public void Proc_T() {
+		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			Proc_F();
+		}
+		while(token == Token.ABRE_PARENTESES || token == Token.DIVISAO || token == Token.AND) {
+			CasaToken(IdentificaToken_T());
+			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				Proc_F();
+			}
+		}
+	}
+	
+	public void Proc_F() {
+		if(token == Token.ABRE_PARENTESES) {
+			CasaToken(Token.ABRE_PARENTESES);
+			Proc_EXP();
+			CasaToken(Token.FECHA_PARENTESES);
+		
+		}else if(token == Token.NOT) {
+			CasaToken(Token.NOT);
+			Proc_F();
+		}else if(token == Token.CONSTANTE) {
+			CasaToken(Token.CONSTANTE);
+		}else if(token == Token.ID) {
+			CasaToken(Token.ID);
+		}
+	}
+	
+	public Token IdentificaToken_T() {
+		
+		if(token == Token.ABRE_PARENTESES)
+			return Token.ABRE_PARENTESES;
+		
+		else if(token == Token.DIVISAO)
+			return Token.DIVISAO;
+
+		else if(token == Token.AND)
+			return Token.AND;
+		
+		return Token.ERRO;
+	}
+
+	public Token IdentificaToken_EXPS(boolean incluiOr) {
+		
+		if(token == Token.MAIS)
+			return Token.MAIS;
+		
+		else if(token == Token.MENOS)
+			return Token.MENOS;
+
+		else if(incluiOr && token == Token.OR)
+			return Token.OR;
+		
+		return Token.ERRO;
+	}
+		
+		
+	public Token IdentificaToken_EXP() {
+		
+		if(token == Token.IGUAL)
+			return Token.IGUAL;
+		
+		else if(token == Token.DIFERENTE_DE)
+			return Token.DIFERENTE_DE;
+		
+		else if(token == Token.MENOR_QUE)
+			return Token.MENOR_QUE;
+		
+		else if(token == Token.MAIOR_QUE)
+			return Token.MAIOR_QUE;
+		
+		else if(token == Token.MENOR_OU_IGUAL_QUE)
+			return Token.MENOR_OU_IGUAL_QUE;
+		
+		else if(token == Token.MAIOR_OU_IGUAL_QUE)
+			return Token.MAIOR_OU_IGUAL_QUE;
+		
+		return Token.ERRO;
+	}
 	
 	public Token IdentificaToken_D() {
 		
