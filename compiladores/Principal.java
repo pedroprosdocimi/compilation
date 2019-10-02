@@ -1,4 +1,30 @@
-package compiladores;
+//package compiladores;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class Principal {
+	public static void main(String[] args) throws IOException{
+		
+		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+		AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
+		
+		int caracter = 0;
+		String codigo = "";
+		
+		while((caracter = bf.read()) != -1) {
+			if(caracter != 13){
+				codigo += (char)caracter;
+			}
+		}
+	    		
+		codigo = analisadorLexico.Analisar(codigo);
+		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico);
+		analisadorSintatico.Proc_S();
+	}
+}
+/*package compiladores;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,4 +54,4 @@ public class Principal {
 		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico);
 		analisadorSintatico.Proc_S();
 	}
-}
+}*/

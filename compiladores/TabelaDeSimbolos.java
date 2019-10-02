@@ -1,4 +1,4 @@
-package compiladores;
+//package compiladores;
 
 import java.util.ArrayList;
 import java.util.HashMap;

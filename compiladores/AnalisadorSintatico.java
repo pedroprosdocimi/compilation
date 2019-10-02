@@ -1,4 +1,4 @@
-package compiladores;
+//package compiladores;
 
 public class AnalisadorSintatico {
 	
@@ -20,9 +20,11 @@ public class AnalisadorSintatico {
 			
 			
 		}else {
-			System.out.println(analisadorLexico.linha+":token nao esperado["+analisadorLexico.lexema+"]");
+			System.out.println(analisadorLexico.linha-1+":token nao esperado["+analisadorLexico.lexema+"]");
 		}
 	}
+	
+	
 	
 	public void Proc_S() {
 		while(token == Token.INTEGER || token == Token.BOOLEAN || token == Token.BYTE || token == Token.STRING || token == Token.CONST) {
@@ -30,10 +32,10 @@ public class AnalisadorSintatico {
 		}
 		if(token == Token.MAIN) {
 			CasaToken(Token.MAIN);
-			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 				Proc_C();
 			}
-			while((token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN)) {
+			while((token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA)) {
 				Proc_C();
 			}
 			if(token == Token.END) {
@@ -54,7 +56,7 @@ public class AnalisadorSintatico {
 				if(token == Token.MENOS) {
 					CasaToken(Token.MENOS);
 				}
-				CasaToken(Token.CONSTANTE);
+				CasaToken(IdentificaConstante());
 			}
 			while(token == Token.VIRGULA) {
 				CasaToken(Token.VIRGULA);
@@ -64,7 +66,7 @@ public class AnalisadorSintatico {
 					if(token == Token.MENOS) {
 						CasaToken(Token.MENOS);
 					}
-					CasaToken(Token.CONSTANTE);
+					CasaToken(IdentificaConstante());
 				}
 			}
 			CasaToken(Token.PONTO_VIRGULA);
@@ -76,8 +78,19 @@ public class AnalisadorSintatico {
 			if(token == Token.MENOS) {
 				CasaToken(Token.MENOS);
 			}
-			CasaToken(Token.CONSTANTE);
+			CasaToken(IdentificaConstante());
 			CasaToken(Token.PONTO_VIRGULA);
+		}
+	}
+	
+	private Token IdentificaConstante() {
+		if(token == Token.TRUE) {
+			return Token.TRUE;
+		}
+		else if(token == Token.FALSE) {
+			return Token.FALSE;
+		}else {
+			return Token.CONSTANTE;
 		}
 	}
 	
@@ -93,16 +106,16 @@ public class AnalisadorSintatico {
 		}else if(token == Token.WHILE) {
 			CasaToken(Token.WHILE);
 			CasaToken(Token.ABRE_PARENTESES);
-			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_EXP();
 			}
 			CasaToken(Token.FECHA_PARENTESES);
-			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 				Proc_C();
 				
 			}else if(token == Token.BEGIN) {
 				CasaToken(Token.BEGIN);
-				while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+				while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 					Proc_C();
 				}
 				CasaToken(Token.END);
@@ -110,7 +123,7 @@ public class AnalisadorSintatico {
 		}else if(token == Token.IF) {
 			CasaToken(Token.IF);
 			CasaToken(Token.ABRE_PARENTESES);
-			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_EXP();
 			}
 			CasaToken(Token.FECHA_PARENTESES);
@@ -129,40 +142,42 @@ public class AnalisadorSintatico {
 		}else if(token == Token.WRITE || token == Token.WRITELN) {
 			CasaToken(IdentificaToken_C());
 			CasaToken(Token.ABRE_PARENTESES);
-			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_EXP();			
 				
 			}else CasaToken(Token.CONSTANTE);
 			while(token == Token.VIRGULA) {
 				CasaToken(Token.VIRGULA);
-				if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 					Proc_EXP();			
 					
 				}else CasaToken(Token.CONSTANTE);
 			}
 			CasaToken(Token.FECHA_PARENTESES);
 			CasaToken(Token.PONTO_VIRGULA);					
+		}else if(token == Token.PONTO_VIRGULA) {
+			CasaToken(Token.PONTO_VIRGULA);
 		}
 	}
 	
 	public void Proc_C1() {
-		if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+		if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 			Proc_C();
 			if(token == Token.ELSE) {
 				CasaToken(Token.ELSE);
-				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 					Proc_C();
 				}
 				if(token == Token.IF) {
 					CasaToken(Token.IF);
 					CasaToken(Token.ABRE_PARENTESES);
-					if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+					if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 						Proc_EXP();								
 					}
 					CasaToken(Token.FECHA_PARENTESES);
 					CasaToken(Token.THEN);
 					CasaToken(Token.BEGIN);
-					while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+					while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 						Proc_C();
 					}
 					CasaToken(Token.END);
@@ -170,7 +185,7 @@ public class AnalisadorSintatico {
 					if(token == Token.ELSE) {
 						CasaToken(Token.ELSE);
 						CasaToken(Token.BEGIN);
-						while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+						while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 							Proc_C();
 						}
 						CasaToken(Token.END);
@@ -178,13 +193,13 @@ public class AnalisadorSintatico {
 				}
 			}
 		}else if(token == Token.BEGIN) {
-			CasaToken(Token.THEN);
 			CasaToken(Token.BEGIN);
-			while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 				Proc_C();
 			}
 			CasaToken(Token.END);
 			if(token == Token.ELSE) {
+				CasaToken(Token.ELSE);
 				Proc_C2();
 			}
 		}
@@ -193,22 +208,22 @@ public class AnalisadorSintatico {
 	public void Proc_C2() {
 		if(token == Token.BEGIN) {
 			CasaToken(Token.BEGIN);
-			while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			while(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
 				Proc_C();
 			}
 			CasaToken(Token.END);
-		}else if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+		}else if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 			Proc_C();
 			CasaToken(Token.THEN);
 			CasaToken(Token.BEGIN);
-			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 				Proc_C();
 			}
 			CasaToken(Token.END);
 			if(token == Token.ELSE) {
 				CasaToken(Token.ELSE);
 				CasaToken(Token.BEGIN);
-				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 					Proc_C();
 				}
 				CasaToken(Token.END);
@@ -216,20 +231,20 @@ public class AnalisadorSintatico {
 		}else if(token == Token.IF) {
 			CasaToken(Token.IF);
 			CasaToken(Token.ABRE_PARENTESES);
-			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_EXP();								
 			}
 			CasaToken(Token.FECHA_PARENTESES);
 			CasaToken(Token.THEN);
 			CasaToken(Token.BEGIN);
-			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 				Proc_C();
 			}
 			CasaToken(Token.END);
 			if(token == Token.ELSE) {
 				CasaToken(Token.ELSE);
 				CasaToken(Token.BEGIN);
-				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN) {
+				if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN|| token == Token.PONTO_VIRGULA) {
 					Proc_C();
 				}
 				CasaToken(Token.END);
@@ -238,7 +253,7 @@ public class AnalisadorSintatico {
 	}
 	
 	public void Proc_EXP() {
-		if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+		if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 			Proc_EXPS();
 		}
 		if(token == Token.IGUAL || token == Token.DIFERENTE_DE || token == Token.MENOR_QUE || token == Token.MAIOR_QUE || token == Token.MENOR_OU_IGUAL_QUE || token == Token.MAIOR_OU_IGUAL_QUE) {
@@ -253,24 +268,24 @@ public class AnalisadorSintatico {
 		if(token == Token.MAIS || token == Token.MENOS) {
 			CasaToken(IdentificaToken_EXPS(false));
 		}
-		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 			Proc_T();
 		}
 		while(token == Token.MAIS || token == Token.MENOS || token == Token.OR) {
 			CasaToken(IdentificaToken_EXPS(true));
-			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_T();
 			}
 		}
 	}
 	
 	public void Proc_T() {
-		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 			Proc_F();
 		}
-		while(token == Token.ABRE_PARENTESES || token == Token.DIVISAO || token == Token.AND) {
+		while(token == Token.MULTIPLICACAO || token == Token.DIVISAO || token == Token.AND) {
 			CasaToken(IdentificaToken_T());
-			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID || token == Token.TRUE || token == Token.FALSE) {
 				Proc_F();
 			}
 		}
@@ -285,17 +300,18 @@ public class AnalisadorSintatico {
 		}else if(token == Token.NOT) {
 			CasaToken(Token.NOT);
 			Proc_F();
-		}else if(token == Token.CONSTANTE) {
-			CasaToken(Token.CONSTANTE);
 		}else if(token == Token.ID) {
 			CasaToken(Token.ID);
+		}else{
+			CasaToken(IdentificaConstante());
 		}
+		
 	}
 	
 	public Token IdentificaToken_T() {
 		
-		if(token == Token.ABRE_PARENTESES)
-			return Token.ABRE_PARENTESES;
+		if(token == Token.MULTIPLICACAO)
+			return Token.MULTIPLICACAO;
 		
 		else if(token == Token.DIVISAO)
 			return Token.DIVISAO;

@@ -1,4 +1,4 @@
-package compiladores;
+//package compiladores;
 
 public class AnalisadorLexico {	
 	
@@ -7,6 +7,7 @@ public class AnalisadorLexico {
 	int estadoAtual;
 	int linha;
 	int pos;
+	int i;
 	String lexema;
 	RegistroLexico registroLexico;
 	TabelaDeSimbolos tabelaSimbolos;
@@ -41,10 +42,17 @@ public class AnalisadorLexico {
 				(c == 91 || c == 93|| c == 95) || (c == 96) || (c == 123) || (c == 125);
 	}	
 
+	private boolean EOF(String EOF){
+		if(lexema == "EOF"){
+			return true;
+		}
+		return false;
+	}	
+
 	
 	public String Analisar(String t){
 		
-		int i=0;
+		i=0;
 		char c;
 		estadoAtual = 0;
 		pos = 0;
@@ -53,14 +61,18 @@ public class AnalisadorLexico {
 		while(estadoAtual != estadoFinal){
 			
 			c = t.charAt(i);
-			System.out.print(c);
+			//System.out.print(c);
 			pos++;
 			if(c == 10) linha++;
 			
-			if(c == 0) return "";
+			if(c == 0) {
+				registroLexico = new RegistroLexico(Token.END, lexema, null, null);
+				return "";
+			}
 			
 			if(!caracterValido(c)) {
 				System.out.println(linha+":caractere invalido.");
+				System.exit(0);
 				break;
 			}
 			
@@ -224,8 +236,9 @@ public class AnalisadorLexico {
         }
             
         else{
+        	System.out.println(linha+":caractere invalido.");
+			System.exit(0);
         	return -1; 
-            //ERRO (caracter não é válido)
         }
         
 		         
@@ -242,10 +255,15 @@ public class AnalisadorLexico {
             lexema += c;
             return 2;
         }
-		
+		/*else if(EOF){
+			lexema += c;
+			System.out.println(linha+":fim de arquivo nao esperado. ");
+			System.exit(0);
+		}*/
         else{
+        	System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
         	return -1; 
-            //ERRO (caracter não é válido)
         } 
 	}
 	
@@ -309,12 +327,21 @@ public class AnalisadorLexico {
 	
 	public int Caso_5(char c) {
 		
-        if(ehHexadecimal(c)){
+		if(ehHexadecimal(c)){
             lexema += c;
             return 6;
-        }
-        
-        return -1;  
+		}
+		/*else if(EOF){
+			lexema += c;
+			System.out.println(linha+":fim de arquivo nao esperado.  ");
+			System.exit(0);
+		}*/
+		else {
+			lexema += c;
+			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
+			return -1;
+		}
 	}
 	
 	public int Caso_6(char c) {
@@ -326,9 +353,13 @@ public class AnalisadorLexico {
             registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, null, TipoConstante.HEXA);
             
             return estadoFinal;
-        }
-		
-		return -1;  
+            
+        }else {
+			lexema += c;
+			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
+			return -1;  
+		}
 	}
 	
 	public int Caso_7(char c) {
@@ -342,8 +373,17 @@ public class AnalisadorLexico {
             lexema += c;
             return 7;
         }		 
-		
-		return -1;  
+		/*else if(EOF){
+			lexema += c;
+			System.out.println(linha+":fim de arquivo nao esperado.  ");
+			System.exit(0);
+		}*/
+		else {
+			lexema += c;
+			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
+			return -1;
+		}	
     }
 	
 	
@@ -388,7 +428,7 @@ public class AnalisadorLexico {
 	
 	public int Caso_10(char c) {
 		
-		if(c != '/' && c != '*'){  
+		if(c != '*'){  
 			
 			registroLexico = new RegistroLexico(Token.DIVISAO, lexema, null, null);
 			Devolve();
@@ -397,8 +437,16 @@ public class AnalisadorLexico {
         }		
 
         else if(c == '*'){
+        	linha--;
             return 11;
         } 
+        else if ( c == '/'){
+			
+			lexema += c;
+			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
+			return -1;
+		}
 		
 		return -1;  
 	}
@@ -424,6 +472,7 @@ public class AnalisadorLexico {
         }
         
 		if(c == '/'){
+			lexema = "";
             return 0;
         }
 		
@@ -463,7 +512,12 @@ public class AnalisadorLexico {
             
             return estadoFinal;
         }
-		
+		else if(c != '='){ 
+			lexema += c;
+			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.exit(0);
+			return -1;
+		}
 		return -1;  
 	}
 	

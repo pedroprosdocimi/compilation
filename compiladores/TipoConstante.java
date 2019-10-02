@@ -1,4 +1,4 @@
-package compiladores;
+//package compiladores;
 
 public enum TipoConstante {
 	
