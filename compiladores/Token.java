@@ -1,4 +1,4 @@
-//package compiladores;
+package compiladores;
 
 public enum Token {
 	
@@ -37,9 +37,7 @@ public enum Token {
 	MAIN(32),
 	WRITE(33),
 	WRITELN(34),
-	TRUE(35),
-	FALSE(36),
-	BOOLEAN(37);
+	BOOLEAN(35);
 	
 	public final Integer indice;
 	

@@ -1,30 +1,4 @@
-//package compiladores;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-public class Principal {
-	public static void main(String[] args) throws IOException{
-		
-		BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-		AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
-		
-		int caracter = 0;
-		String codigo = "";
-		
-		while((caracter = bf.read()) != -1) {
-			if(caracter != 13){
-				codigo += (char)caracter;
-			}
-		}
-	    		
-		codigo = analisadorLexico.Analisar(codigo);
-		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico);
-		analisadorSintatico.Proc_S();
-	}
-}
-/*package compiladores;
+package compiladores;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +8,7 @@ import java.nio.file.Paths;
 public class Principal {
 	public static void main(String[] args) throws IOException{
 		
-	    Path wiki_path = Paths.get("C:/Users/Pedro/eclipse-workspace/compiladores/src/compiladores/", "exemplo6.l");
+	    Path wiki_path = Paths.get("C:/Users/Pedro/eclipse-workspace/compiladores/src/compiladores/testes", "sintatico_completo.l");
 	    
 		AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
 		
@@ -51,7 +25,7 @@ public class Principal {
 		
 	    String codigo = new String(codigoFonte, "ASCII");
 		codigo = analisadorLexico.Analisar(codigo);
-		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico);
+		AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(analisadorLexico.registroLexico.token, codigo, analisadorLexico, new AnalisadorSemantico());
 		analisadorSintatico.Proc_S();
 	}
-}*/
+}

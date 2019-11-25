@@ -1,4 +1,4 @@
-//package compiladores;
+package compiladores;
 
 public class AnalisadorLexico {	
 	
@@ -53,25 +53,29 @@ public class AnalisadorLexico {
 	public String Analisar(String t){
 		
 		i=0;
-		char c;
+		char c = 0;
 		estadoAtual = 0;
 		pos = 0;
 		lexema = "";
 		
 		while(estadoAtual != estadoFinal){
 			
-			c = t.charAt(i);
-			//System.out.print(c);
+			try {
+				c = t.charAt(i);
+				System.out.print(c);
+			}catch(Exception e) {
+				return "";
+			}
 			pos++;
 			if(c == 10) linha++;
 			
-			if(c == 0) {
-				registroLexico = new RegistroLexico(Token.END, lexema, null, null);
+			if(c == 0) { //EOF
+				registroLexico = new RegistroLexico(Token.END, lexema, null);
 				return "";
 			}
 			
 			if(!caracterValido(c)) {
-				System.out.println(linha+":caractere invalido.");
+				System.out.println(linha+1+":caractere invalido.");
 				System.exit(0);
 				break;
 			}
@@ -115,7 +119,11 @@ public class AnalisadorLexico {
 		            
 				case 7:
 
-					estadoAtual = Caso_7(c);               
+					estadoAtual = Caso_7(c);     
+					if(t.charAt(i+1) == 0) {
+						System.out.println(linha+1+":final de arquivo não esperado");
+						System.exit(0);
+					}
 		            break; 
 		            
 				case 8:
@@ -134,8 +142,13 @@ public class AnalisadorLexico {
 		            break; 
 		            
 				case 11:
-
+					
 					estadoAtual = Caso_11(c);
+					if(t.charAt(i+1) == 0) {
+						System.out.println(linha+1+":final de arquivo não esperado");
+						System.exit(0);
+					}
+					
 					break; 
 					
 				case 12:
@@ -236,7 +249,7 @@ public class AnalisadorLexico {
         }
             
         else{
-        	System.out.println(linha+":caractere invalido.");
+        	System.out.println(linha+1+":caractere invalido.");
 			System.exit(0);
         	return -1; 
         }
@@ -255,13 +268,9 @@ public class AnalisadorLexico {
             lexema += c;
             return 2;
         }
-		/*else if(EOF){
-			lexema += c;
-			System.out.println(linha+":fim de arquivo nao esperado. ");
-			System.exit(0);
-		}*/
+		
         else{
-        	System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+        	System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
         	return -1; 
         } 
@@ -277,11 +286,9 @@ public class AnalisadorLexico {
         else{
         	
         	if(tabelaSimbolos.PesquisarNaTabela(lexema)==null)
-        		tabelaSimbolos.InserirNaTabela(Token.ID, lexema);
+        		tabelaSimbolos.InserirNaTabela(Token.ID, lexema, Classe.VAZIO, Tipo.VAZIO);
         	
-        	Integer pos = tabelaSimbolos.PesquisarNaTabela(lexema);
-        	
-        	registroLexico = new RegistroLexico(tabelaSimbolos.RetornaToken(pos), lexema, tabelaSimbolos.PesquisarNaTabela(lexema), null);
+        	registroLexico = new RegistroLexico(tabelaSimbolos.RetornaToken(lexema), lexema, null);
         	Devolve();
         	
             return estadoFinal;            
@@ -297,7 +304,7 @@ public class AnalisadorLexico {
 		
         else{
         	
-        	registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, null, TipoConstante.INTEIRO);
+        	registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, Tipo.INTEIRO);
         	
         	Devolve();
             return estadoFinal;
@@ -318,7 +325,7 @@ public class AnalisadorLexico {
 		
         else{
         	
-        	registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, null, TipoConstante.INTEIRO);
+        	registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, Tipo.INTEIRO);
         	Devolve();
         	
             return estadoFinal;
@@ -338,7 +345,7 @@ public class AnalisadorLexico {
 		}*/
 		else {
 			lexema += c;
-			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
 			return -1;
 		}
@@ -350,13 +357,13 @@ public class AnalisadorLexico {
 			
             lexema += c;
             
-            registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, null, TipoConstante.HEXA);
+            registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, Tipo.BYTE);
             
             return estadoFinal;
             
         }else {
 			lexema += c;
-			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
 			return -1;  
 		}
@@ -380,7 +387,7 @@ public class AnalisadorLexico {
 		}*/
 		else {
 			lexema += c;
-			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
 			return -1;
 		}	
@@ -391,7 +398,7 @@ public class AnalisadorLexico {
 		
 		if(c != 39){  //Aspas Simples
 			
-			registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, null, TipoConstante.STRING);
+			registroLexico = new RegistroLexico(Token.CONSTANTE, lexema, Tipo.STRING);
 			Devolve();
 			
             return estadoFinal;
@@ -410,14 +417,14 @@ public class AnalisadorLexico {
 		if(c == '='){  
 			
             lexema += c;
-            registroLexico = new RegistroLexico(Token.IGUAL, lexema, null, null);
+            registroLexico = new RegistroLexico(Token.IGUAL, lexema, null);
             
             return estadoFinal;
         }
 		
         else if(c != '='){      
         	
-        	registroLexico = new RegistroLexico(Token.ATRIBUICAO, lexema, null, null);
+        	registroLexico = new RegistroLexico(Token.ATRIBUICAO, lexema, null);
         	Devolve();
         	
             return estadoFinal;
@@ -430,7 +437,7 @@ public class AnalisadorLexico {
 		
 		if(c != '*'){  
 			
-			registroLexico = new RegistroLexico(Token.DIVISAO, lexema, null, null);
+			registroLexico = new RegistroLexico(Token.DIVISAO, lexema, null);
 			Devolve();
 			
             return estadoFinal;
@@ -443,7 +450,7 @@ public class AnalisadorLexico {
         else if ( c == '/'){
 			
 			lexema += c;
-			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
 			return -1;
 		}
@@ -453,21 +460,21 @@ public class AnalisadorLexico {
 	
 	public int Caso_11(char c) {
 		
-		if(c != 26 && c != '*'){  //EOF
-            return 11;
-        }
-		
-        else if(c == '*'){
-            return 12;
-        } 
-		
-		return -1;  
+		if(c != 26 && c != '*'){
+	        return 11;
+	    }
+			
+	    else if(c == '*'){
+	        return 12;
+	    } 
+			
+		return -1;		 
     }
 	
 	
 	public int Caso_12(char c) {
 		
-		if(c != '/'){  
+		if(c != '/'){ 
             return 11;
         }
         
@@ -487,14 +494,14 @@ public class AnalisadorLexico {
 		if(c == '='){  
 			
             lexema += c;            
-            registroLexico = new RegistroLexico(Token.MENOR_QUE, lexema, null, null);
+            registroLexico = new RegistroLexico(Token.MENOR_QUE, lexema, null);
             
             return estadoFinal;
         }
 		
         else if(c != '='){
         	
-        	registroLexico = new RegistroLexico(Token.MENOR_OU_IGUAL_QUE, lexema, null, null);
+        	registroLexico = new RegistroLexico(Token.MENOR_OU_IGUAL_QUE, lexema, null);
         	Devolve();
         	
             return estadoFinal;
@@ -508,13 +515,13 @@ public class AnalisadorLexico {
 		if(c == '='){  
 			
             lexema += c;
-            registroLexico = new RegistroLexico(Token.DIFERENTE_DE, lexema, null, null);
+            registroLexico = new RegistroLexico(Token.DIFERENTE_DE, lexema, null);
             
             return estadoFinal;
         }
 		else if(c != '='){ 
 			lexema += c;
-			System.out.println(linha+":Lexema nao identificado " +"[ "+ lexema +" ]");
+			System.out.println(linha+1+":Lexema nao identificado " +"[ "+ lexema +" ]");
 			System.exit(0);
 			return -1;
 		}
@@ -526,14 +533,14 @@ public class AnalisadorLexico {
 		if(c == '='){  
 			
             lexema += c;            
-            registroLexico = new RegistroLexico(Token.MAIOR_QUE, lexema, null, null);
+            registroLexico = new RegistroLexico(Token.MAIOR_QUE, lexema,null);
             
             return estadoFinal;
         }
 		
         else if(c != '='){
         	
-        	registroLexico = new RegistroLexico(Token.MAIOR_OU_IGUAL_QUE, lexema, null, null);
+        	registroLexico = new RegistroLexico(Token.MAIOR_OU_IGUAL_QUE, lexema, null);
         	Devolve();
         	
             return estadoFinal;
@@ -549,28 +556,28 @@ public class AnalisadorLexico {
 	public RegistroLexico InserirRegistroLexicoPorCaracterer(char c) {
 		
 		if (c == ')')
-			return new RegistroLexico(Token.FECHA_PARENTESES, ")", null, null);
+			return new RegistroLexico(Token.FECHA_PARENTESES, ")", null);
 		
 		if (c == '(') 
-			return new RegistroLexico(Token.ABRE_PARENTESES, "(", null, null);
+			return new RegistroLexico(Token.ABRE_PARENTESES, "(", null);
 		
 		if (c == ';')
-			return new RegistroLexico(Token.PONTO_VIRGULA, ";", null, null);
+			return new RegistroLexico(Token.PONTO_VIRGULA, ";", null);
 		
 		if (c == ',')
-			return new RegistroLexico(Token.VIRGULA, ",", null, null);
+			return new RegistroLexico(Token.VIRGULA, ",", null);
 			
 		if (c == '+')
-			return new RegistroLexico(Token.MAIS, "+", null, null);
+			return new RegistroLexico(Token.MAIS, "+", null);
 			
 		if (c == '-')
-			return new RegistroLexico(Token.MENOS, "-", null, null);
+			return new RegistroLexico(Token.MENOS, "-", null);
 			
 		if (c == '*') 
-			return new RegistroLexico(Token.MULTIPLICACAO, "*", null, null);
+			return new RegistroLexico(Token.MULTIPLICACAO, "*", null);
 		
 		
-		return new RegistroLexico(Token.ERRO, "", null, null);
+		return new RegistroLexico(Token.ERRO, "", null);
 		
 	}
 	
