@@ -46,7 +46,15 @@ public class AnalisadorSemantico {
 			elemento.tipo = tipo;
 		else if(elemento.tipo != tipo) {
 			System.out.println(linha+":tipos incompatíveis.");
+			System.exit(0);
 		}
 		return elemento;
+	}
+	
+	public void Regra_15(ElementoTabelaSimbolo elemento, int linha) {
+		if(elemento.tipo != Tipo.LOGICO) {
+			System.out.println(linha+":tipos incompatíveis.");
+			System.exit(0);
+		}
 	}
 }

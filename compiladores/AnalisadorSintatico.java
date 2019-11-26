@@ -15,7 +15,7 @@ public class AnalisadorSintatico {
 	}
 	
 	public void CasaToken(Token token_esperado) {
-		//System.out.println("Lexema: "+analisadorLexico.lexema+"  Token: "+token);
+		System.out.println("Lexema: "+analisadorLexico.lexema+"  Token: "+token);
 		if(token == token_esperado) {
 			codigo = analisadorLexico.Analisar(codigo);
 			token = analisadorLexico.registroLexico.token;
@@ -113,7 +113,8 @@ public class AnalisadorSintatico {
 			CasaToken(Token.WHILE);
 			CasaToken(Token.ABRE_PARENTESES);
 			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
-				Proc_EXP();
+				Regra15();
+				Proc_EXP();				
 			}
 			CasaToken(Token.FECHA_PARENTESES);
 			if(token == Token.ID || token == Token.WHILE || token == Token.IF || token == Token.READLN || token == Token.WRITE || token == Token.WRITELN || token == Token.PONTO_VIRGULA) {
@@ -456,5 +457,9 @@ public class AnalisadorSintatico {
 	
 	public ElementoTabelaSimbolo Regra5(ElementoTabelaSimbolo elementoId, Tipo tipo) {
 		return analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_5(elementoId, tipo, analisadorLexico.linha));
+	}
+	
+	public void Regra15() {
+		analisadorSemantico.Regra_15(analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema), analisadorLexico.linha);
 	}
 }

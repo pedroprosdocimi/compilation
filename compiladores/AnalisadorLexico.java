@@ -288,7 +288,7 @@ public class AnalisadorLexico {
         	if(tabelaSimbolos.PesquisarNaTabela(lexema)==null)
         		tabelaSimbolos.InserirNaTabela(Token.ID, lexema, Classe.VAZIO, Tipo.VAZIO);
         	
-        	registroLexico = new RegistroLexico(tabelaSimbolos.RetornaToken(lexema), lexema, null);
+        	registroLexico = new RegistroLexico(tabelaSimbolos.RetornaToken(lexema), lexema, tabelaSimbolos.RetornaTipo(lexema));
         	Devolve();
         	
             return estadoFinal;            

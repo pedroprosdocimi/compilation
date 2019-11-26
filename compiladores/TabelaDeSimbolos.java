@@ -37,6 +37,12 @@ public class TabelaDeSimbolos {
 		 return tabelaSimbolos.get(elemento.lexema);
 	 }
 	 
+	 public Tipo RetornaTipo(String lexema) {
+		 if(lexema.equals("true") || lexema.equals("false"))
+			 return Tipo.LOGICO;
+		 else
+			 return Tipo.VAZIO;
+	 }
 	 public Token RetornaToken(String lexema) {
 		 
 		 if(lexema.equals("const")) 
@@ -91,7 +97,10 @@ public class TabelaDeSimbolos {
 			 return Token.WRITELN;
 		 
 		 else if(lexema.equals("boolean")) 
-			 return Token.BOOLEAN;		 
+			 return Token.BOOLEAN;	
+		 
+		 else if(lexema.equals("true") || lexema.equals("false"))
+			 return Token.CONSTANTE;
 		 
 		 else
 			 return Token.ID;
@@ -137,6 +146,8 @@ public class TabelaDeSimbolos {
 		 tabelaSimbolos.add(new ElementoTabelaSimbolo(Token.CONSTANTE, "true", null, null));
 		 tabelaSimbolos.add(new ElementoTabelaSimbolo(Token.CONSTANTE, "false", null, null));
 		 tabelaSimbolos.add(new ElementoTabelaSimbolo(Token.BOOLEAN, "boolean", null, null));
+		 tabelaSimbolos.add(new ElementoTabelaSimbolo(Token.CONSTANTE, "false", null, Tipo.LOGICO));
+		 tabelaSimbolos.add(new ElementoTabelaSimbolo(Token.CONSTANTE, "true", null, Tipo.LOGICO));
 		 
 		 return tabelaSimbolos;
 	 }
