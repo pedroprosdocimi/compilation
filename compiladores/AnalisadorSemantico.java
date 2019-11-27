@@ -66,33 +66,59 @@ public class AnalisadorSemantico {
 		return elemento;
 	}
 	
-	public ElementoTabelaSimbolo Regra_12(ElementoTabelaSimbolo elemento, Tipo tipo, int linha, Token flag) {		
-		
-		if(flag  == Token.MAIS || flag  == Token.MENOS) {
-		   if((tipo == Tipo.INTEIRO && elemento.tipo == Tipo.INTEIRO)||( tipo == Tipo.BYTE && elemento.tipo == Tipo.INTEIRO)||(tipo == Tipo.INTEIRO && elemento.tipo == Tipo.BYTE)){		    
-			   elemento.tipo = Tipo.INTEIRO;
-		   }
-		   else if(tipo == Tipo.STRING && elemento.tipo == Tipo.STRING) {
-			   elemento.tipo = Tipo.STRING;
-		   }
-		   else if(tipo == Tipo.BYTE && elemento.tipo == Tipo.BYTE) {
-			   elemento.tipo = Tipo.BYTE;
-		   }
-		   else {
-			   System.out.println(linha+":tipos incompatíveis.");
-			   System.exit(0);
-		   }
+	public ElementoTabelaSimbolo Regra_12(RegistroLexico registro, ElementoTabelaSimbolo elemento, Tipo tipo, int linha, Token flag) {		
+		if(registro.token == Token.ID) {
+			if(flag  == Token.MAIS || flag  == Token.MENOS) {
+			   if((tipo == Tipo.INTEIRO && elemento.tipo == Tipo.INTEIRO)||( tipo == Tipo.BYTE && elemento.tipo == Tipo.INTEIRO)||(tipo == Tipo.INTEIRO && elemento.tipo == Tipo.BYTE)){		    
+				   elemento.tipo = Tipo.INTEIRO;
+			   }
+			   else if(tipo == Tipo.STRING && elemento.tipo == Tipo.STRING) {
+				   elemento.tipo = Tipo.STRING;
+			   }
+			   else if(tipo == Tipo.BYTE && elemento.tipo == Tipo.BYTE) {
+				   elemento.tipo = Tipo.BYTE;
+			   }
+			   else {
+				   System.out.println(linha+":tipos incompatíveis.");
+				   System.exit(0);
+			   }
+			}
+			else if(flag  == Token.OR) {
+					if(tipo != Tipo.LOGICO || elemento.tipo != Tipo.LOGICO) {
+						System.out.println(linha+":tipos incompatíveis.");
+						System.exit(0);
+					}
+					else if(tipo == Tipo.LOGICO && elemento.tipo == Tipo.LOGICO) {
+						elemento.tipo = Tipo.LOGICO;
+					}
+			}
 		}
-		else if(flag  == Token.OR) {
-				if(tipo != Tipo.LOGICO || elemento.tipo != Tipo.LOGICO) {
-					System.out.println(linha+":tipos incompatíveis.");
-					System.exit(0);
-				}
-				else if(tipo == Tipo.LOGICO && elemento.tipo == Tipo.LOGICO) {
-					elemento.tipo = Tipo.LOGICO;
-				}
+		else{
+			if(flag  == Token.MAIS || flag  == Token.MENOS) {
+			   if((tipo == Tipo.INTEIRO && registro.tipo == Tipo.INTEIRO)||( tipo == Tipo.BYTE && registro.tipo == Tipo.INTEIRO)||(tipo == Tipo.INTEIRO && registro.tipo == Tipo.BYTE)){		    
+				   elemento.tipo = Tipo.INTEIRO;
+			   }
+			   else if(tipo == Tipo.STRING && registro.tipo == Tipo.STRING) {
+				   elemento.tipo = Tipo.STRING;
+			   }
+			   else if(tipo == Tipo.BYTE && registro.tipo == Tipo.BYTE) {
+				   elemento.tipo = Tipo.BYTE;
+			   }
+			   else {
+				   System.out.println(linha+":tipos incompatíveis.");
+				   System.exit(0);
+			   }
+			}
+			else if(flag  == Token.OR) {
+					if(tipo != Tipo.LOGICO || registro.tipo != Tipo.LOGICO) {
+						System.out.println(linha+":tipos incompatíveis.");
+						System.exit(0);
+					}
+					else if(tipo == Tipo.LOGICO && registro.tipo == Tipo.LOGICO) {
+						elemento.tipo = Tipo.LOGICO;
+					}
+			}
 		}
-		
 		return elemento;
 	}
 	
@@ -135,8 +161,88 @@ public class AnalisadorSemantico {
 		
 	}
 	
-	public void Regra_15(ElementoTabelaSimbolo elemento, int linha) {
-		if(elemento.tipo != Tipo.LOGICO) {
+	public ElementoTabelaSimbolo Regra_14(RegistroLexico registro,ElementoTabelaSimbolo elemento, Tipo tipo, int linha, Token flag) {
+		  
+		if(registro.token == Token.ID) {
+			if(flag == Token.MULTIPLICACAO){
+				   
+				   if((tipo == Tipo.INTEIRO && elemento.tipo == Tipo.BYTE)||( tipo == Tipo.BYTE && elemento.tipo == Tipo.INTEIRO)|| (tipo == Tipo.INTEIRO && elemento.tipo == Tipo.INTEIRO)){		    
+				    tipo = Tipo.INTEIRO;
+				   }
+				   else if (tipo == Tipo.BYTE && elemento.tipo == Tipo.BYTE) {
+				    tipo = Tipo.BYTE;
+				   }
+				   else {
+				    System.out.println(linha + ":tipos incompatíveis.");
+				    System.exit(0);
+				   }
+				   
+				   
+				  }
+				  else if(flag == Token.DIVISAO) {
+				   
+				   if((tipo == Tipo.INTEIRO && elemento.tipo == Tipo.BYTE)||(tipo == Tipo.BYTE && elemento.tipo == Tipo.INTEIRO)|| (tipo == Tipo.INTEIRO && elemento.tipo == Tipo.INTEIRO)||(tipo == Tipo.BYTE && elemento.tipo == Tipo.BYTE)) {
+				    
+				    tipo = Tipo.INTEIRO;
+				   }
+				   else {
+				    System.out.println(linha + ":tipos incompatíveis.");
+				    System.exit(0);
+				   }
+				   
+				  }
+				  else if(flag == Token.AND) {
+				   if(tipo != Tipo.LOGICO || elemento.tipo != Tipo.LOGICO) {
+				    System.out.println(linha + ":tipos incompatíveis.");
+				    System.exit(0);
+				   }
+				   else if(tipo == Tipo.LOGICO && elemento.tipo == Tipo.LOGICO) {
+				    tipo = elemento.tipo;
+				   }
+				  }
+		}else {
+			  if(flag == Token.MULTIPLICACAO){
+			   
+			   if((tipo == Tipo.INTEIRO && registro.tipo == Tipo.BYTE)||( tipo == Tipo.BYTE && registro.tipo == Tipo.INTEIRO)|| (tipo == Tipo.INTEIRO && registro.tipo == Tipo.INTEIRO)){		    
+			    tipo = Tipo.INTEIRO;
+			   }
+			   else if (tipo == Tipo.BYTE && registro.tipo == Tipo.BYTE) {
+			    tipo = Tipo.BYTE;
+			   }
+			   else {
+			    System.out.println(linha + ":tipos incompatíveis.");
+			    System.exit(0);
+			   }
+			   
+			   
+			  }
+			  else if(flag == Token.DIVISAO) {
+			   
+			   if((tipo == Tipo.INTEIRO && registro.tipo == Tipo.BYTE)||(tipo == Tipo.BYTE && registro.tipo == Tipo.INTEIRO)|| (tipo == Tipo.INTEIRO && registro.tipo == Tipo.INTEIRO)||(tipo == Tipo.BYTE && registro.tipo == Tipo.BYTE)) {
+			    
+			    tipo = Tipo.INTEIRO;
+			   }
+			   else {
+			    System.out.println(linha + ":tipos incompatíveis. REG14/");
+			    System.exit(0);
+			   }
+			   
+			  }
+			  else if(flag == Token.AND) {
+			   if(tipo != Tipo.LOGICO || registro.tipo != Tipo.LOGICO) {
+			    System.out.println(linha + ":tipos incompatíveis. REG14AND");
+			    System.exit(0);
+			   }
+			   else if(tipo == Tipo.LOGICO && registro.tipo == Tipo.LOGICO) {
+			    tipo = registro.tipo;
+			   }
+			  }
+		}
+		  return elemento;
+	}
+	
+	public void Regra_15(Tipo tipo, int linha) {
+		if(tipo != Tipo.LOGICO) {
 			System.out.println(linha+":tipos incompatíveis.");
 			System.exit(0);
 		}
