@@ -52,6 +52,7 @@ public class AnalisadorSintatico {
 	public void Proc_D() {
 		Tipo tipo;
 		ElementoTabelaSimbolo elementoId;
+		boolean flag = false;
 		if(token == Token.INTEGER || token == Token.BOOLEAN || token == Token.BYTE || token == Token.STRING) {
 			tipo = IdentificaTipo();
 			CasaToken(IdentificaToken_D());
@@ -59,10 +60,13 @@ public class AnalisadorSintatico {
 			CasaToken(Token.ID);			
 			if(token == Token.ATRIBUICAO) {
 				CasaToken(Token.ATRIBUICAO);
-				if(token == Token.MENOS) {
-					CasaToken(Token.MENOS);
+				if(token == Token.MENOS || token == Token.MAIS) {
+					if(token == Token.MENOS) {
+						flag = Regra20();
+					}
+					CasaToken(VerificaMaisMenos(token));
 				}
-				Regra2(elementoId);
+				Regra2(elementoId, flag);
 				CasaToken(Token.CONSTANTE);
 			}
 			while(token == Token.VIRGULA) {
@@ -71,10 +75,13 @@ public class AnalisadorSintatico {
 				CasaToken(Token.ID);
 				if(token == Token.ATRIBUICAO) {
 					CasaToken(Token.ATRIBUICAO);
-					if(token == Token.MENOS) {
-						CasaToken(Token.MENOS);
+					if(token == Token.MENOS || token == Token.MAIS) {
+						if(token == Token.MENOS) {
+							flag = Regra20();
+						}							
+						CasaToken(VerificaMaisMenos(token));
 					}
-					Regra2(elementoId);
+					Regra2(elementoId, flag);
 					CasaToken(Token.CONSTANTE);
 				}
 			}
@@ -85,20 +92,28 @@ public class AnalisadorSintatico {
 			elementoId = Regra3();
 			CasaToken(Token.ID);
 			CasaToken(Token.ATRIBUICAO);
-			if(token == Token.MENOS) {
-				CasaToken(Token.MENOS);
+			if(token == Token.MENOS || token == Token.MAIS) {
+				if(token == Token.MENOS) {
+					flag = Regra20();
+				}
+				CasaToken(VerificaMaisMenos(token));
 			}
-			Regra2(elementoId);
+			Regra2(elementoId, flag);
 			CasaToken(Token.CONSTANTE);
 			CasaToken(Token.PONTO_VIRGULA);
 		}
 	}
 	
-	
+	private Token VerificaMaisMenos(Token token) {
+		if(token == Token.MENOS) {
+			return Token.MENOS;
+		}else
+			return Token.MAIS;
+	}
 	
 	public void Proc_C() {
 		ElementoTabelaSimbolo elementoId;
-		Tipo tipo;
+		Tipo tipo = Tipo.VAZIO;
 		if(token == Token.ID) {
 			elementoId = Regra4();
 			CasaToken(Token.ID);
@@ -130,7 +145,7 @@ public class AnalisadorSintatico {
 		}else if(token == Token.IF) {
 			CasaToken(Token.IF);
 			CasaToken(Token.ABRE_PARENTESES);
-			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {				
 				Proc_EXP();
 			}
 			CasaToken(Token.FECHA_PARENTESES);
@@ -142,6 +157,7 @@ public class AnalisadorSintatico {
 		}else if(token == Token.READLN) {
 			CasaToken(Token.READLN);
 			CasaToken(Token.ABRE_PARENTESES);
+			Regra26();
 			CasaToken(Token.ID);
 			CasaToken(Token.FECHA_PARENTESES);
 			CasaToken(Token.PONTO_VIRGULA);
@@ -150,15 +166,15 @@ public class AnalisadorSintatico {
 			CasaToken(IdentificaToken_C());
 			CasaToken(Token.ABRE_PARENTESES);
 			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
-				Proc_EXP();			
-				
-			}else CasaToken(Token.CONSTANTE);
+				tipo = Regra30();
+				Proc_EXP();					
+			}
 			while(token == Token.VIRGULA) {
 				CasaToken(Token.VIRGULA);
 				if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
-					Proc_EXP();			
-					
-				}else CasaToken(Token.CONSTANTE);
+					Regra31(tipo);
+					Proc_EXP();
+				}
 			}
 			CasaToken(Token.FECHA_PARENTESES);
 			CasaToken(Token.PONTO_VIRGULA);					
@@ -179,6 +195,7 @@ public class AnalisadorSintatico {
 					CasaToken(Token.IF);
 					CasaToken(Token.ABRE_PARENTESES);
 					if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+						Regra15();
 						Proc_EXP();								
 					}
 					CasaToken(Token.FECHA_PARENTESES);
@@ -239,6 +256,7 @@ public class AnalisadorSintatico {
 			CasaToken(Token.IF);
 			CasaToken(Token.ABRE_PARENTESES);
 			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				Regra15();
 				Proc_EXP();								
 			}
 			CasaToken(Token.FECHA_PARENTESES);
@@ -261,14 +279,17 @@ public class AnalisadorSintatico {
 	
 	public Tipo Proc_EXP() {
 		Tipo tipo = null;
+		Token flag;
 		if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
 			tipo = Proc_EXPS();
 		}
 		if(token == Token.IGUAL || token == Token.DIFERENTE_DE || token == Token.MENOR_QUE || token == Token.MAIOR_QUE || token == Token.MENOR_OU_IGUAL_QUE || token == Token.MAIOR_OU_IGUAL_QUE) {
+			flag = IdentificaToken_EXP();
 			CasaToken(IdentificaToken_EXP());
 			if(token == Token.MAIS || token == Token.MENOS || token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
-				tipo = Proc_EXPS();
-				
+				tipo = Regra13(tipo, flag);
+				Proc_EXPS();
+								
 			}else {
 				System.out.println(analisadorLexico.linha+1+":token nao esperado["+analisadorLexico.lexema+"]");
 				System.exit(0);
@@ -279,15 +300,18 @@ public class AnalisadorSintatico {
 	
 	public Tipo Proc_EXPS() {
 		Tipo tipo = null;
+		Token flag;
 		if(token == Token.MAIS || token == Token.MENOS) {
 			CasaToken(IdentificaToken_EXPS(false));			
 		}
 		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
-			tipo = Proc_T();
+			tipo = Proc_T();			
 		}		
 		while(token == Token.MAIS || token == Token.MENOS || token == Token.OR) {
+			flag = IdentificaToken_EXPS(true);
 			CasaToken(IdentificaToken_EXPS(true));
 			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
+				Regra12(tipo, flag);
 				tipo = Proc_T();
 			}else {
 				System.out.println(analisadorLexico.linha+1+":token nao esperado["+analisadorLexico.lexema+"]");
@@ -299,10 +323,12 @@ public class AnalisadorSintatico {
 	
 	public Tipo Proc_T() {
 		Tipo tipo = null;
+		Token flag;
 		if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
 			tipo = Proc_F();
 		}
 		while(token == Token.MULTIPLICACAO || token == Token.DIVISAO || token == Token.AND) {
+			flag = IdentificaToken_T();
 			CasaToken(IdentificaToken_T());
 			if(token == Token.ABRE_PARENTESES || token == Token.NOT || token == Token.CONSTANTE || token == Token.ID) {
 				tipo = Proc_F();
@@ -326,7 +352,7 @@ public class AnalisadorSintatico {
 			tipo = Proc_F();
 			return tipo;
 		}else if(token == Token.ID) {
-			tipo = analisadorLexico.registroLexico.tipo;
+			tipo = analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema).tipo;
 			CasaToken(Token.ID);
 			return tipo;
 		}else if(token == Token.CONSTANTE){
@@ -443,8 +469,8 @@ public class AnalisadorSintatico {
 		return analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_1(analisadorLexico.registroLexico, analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema),tipo, analisadorLexico.linha));
 	}
 	
-	public void Regra2(ElementoTabelaSimbolo elementoId) {
-		analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_2(analisadorLexico.registroLexico, elementoId, analisadorLexico.linha));
+	public void Regra2(ElementoTabelaSimbolo elementoId, boolean flag) {
+		analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_2(flag, analisadorLexico.registroLexico, elementoId, analisadorLexico.linha));
 	}
 	
 	public ElementoTabelaSimbolo Regra3() {
@@ -459,7 +485,32 @@ public class AnalisadorSintatico {
 		return analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_5(elementoId, tipo, analisadorLexico.linha));
 	}
 	
+	public ElementoTabelaSimbolo Regra12(Tipo tipo, Token flag) {	
+		return analisadorLexico.tabelaSimbolos.AtualizarElemento(analisadorSemantico.Regra_12(analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema), tipo, analisadorLexico.linha, flag));
+	}
+	
+	public Tipo Regra13(Tipo tipo, Token flag) {
+		ElementoTabelaSimbolo elemento = analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema);
+		return analisadorSemantico.Regra_13(analisadorLexico.registroLexico, elemento, tipo, analisadorLexico.linha, flag);
+	}
+	
 	public void Regra15() {
 		analisadorSemantico.Regra_15(analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema), analisadorLexico.linha);
+	}
+	
+	public void Regra26() {
+		analisadorSemantico.Regra_26(analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema), analisadorLexico.linha);
+	}
+	
+	public boolean Regra20() {
+		return analisadorSemantico.Regra_20();
+	}
+	
+	public Tipo Regra30() {
+		return analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema).tipo;
+	}
+	
+	public void Regra31(Tipo c) {
+		analisadorSemantico.Regra_31(c, analisadorLexico.tabelaSimbolos.PesquisarNaTabela(analisadorLexico.registroLexico.lexema).tipo, analisadorLexico.linha);
 	}
 }

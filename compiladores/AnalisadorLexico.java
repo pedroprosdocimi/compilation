@@ -187,7 +187,7 @@ public class AnalisadorLexico {
 	public int Caso_0(char c) {		
                    
 		//Se for \n ou ESPAÇO, continua no estado 
-        if(c == 10 || c == 32){
+        if(c == 10 || c == 32 || c == 9){
         	return 0; 
         }
             

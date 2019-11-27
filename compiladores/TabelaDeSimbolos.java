@@ -40,8 +40,17 @@ public class TabelaDeSimbolos {
 	 public Tipo RetornaTipo(String lexema) {
 		 if(lexema.equals("true") || lexema.equals("false"))
 			 return Tipo.LOGICO;
-		 else
-			 return Tipo.VAZIO;
+		 
+		 else if(lexema.equals("integer"))
+			 return Tipo.INTEIRO;
+		 
+		 else if(lexema.equals("byte"))
+			 return Tipo.BYTE;
+		
+		 else if(lexema.equals("string"))
+			return Tipo.STRING;
+					
+			return Tipo.VAZIO;
 	 }
 	 public Token RetornaToken(String lexema) {
 		 

@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 
 public class Principal {
 	public static void main(String[] args) throws IOException{
-	    Path wiki_path = Paths.get("C:/Users/Dell/Desktop/compilation-master/compiladores/", "t5.l");
+	    Path wiki_path = Paths.get("C:/Users/Pedro/eclipse-workspace/compiladores/src/compiladores/testes", "t8.l");
 	    
 		AnalisadorLexico analisadorLexico = new AnalisadorLexico(1);
 		
